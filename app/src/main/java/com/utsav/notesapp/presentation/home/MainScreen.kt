@@ -1,5 +1,6 @@
 package com.utsav.notesapp.presentation.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,8 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -24,9 +24,7 @@ fun MainScreen(
     navController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel, notes: List<NotesData> = listOf()
 ) {
-    val notesList = remember {
-        mutableStateListOf<NotesData>()
-    }
+
 
 
     Scaffold(
@@ -34,20 +32,14 @@ fun MainScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-
-
                     homeViewModel.addNote(
                         NotesData(
                             "note ${homeViewModel.notes.size + 1}",
                             homeViewModel.notes.size + 1
                         )
                     )
-                    notesList.add(
-                        NotesData(
-                            "note ${homeViewModel.notes.size + 1}",
-                            homeViewModel.notes.size + 1
-                        )
-                    )
+                    Log.e("home view model list", "MainScreen: ${homeViewModel.notes.size}")
+
                 },
                 content = {
                     Icon(Icons.Filled.Add, "", tint = Color.White)
@@ -55,15 +47,7 @@ fun MainScreen(
             )
         },
         content = {
-//            setNotes(notes)
-
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-            ) {
-                items(items = notesList) {
-                    NoteCard(note = it)
-                }
-            }
+            setNotes(notes = homeViewModel.notes)
         }
     )
 
@@ -71,8 +55,16 @@ fun MainScreen(
 }
 
 @Composable
-fun setNotes(notes: List<NotesData>) {
-
+fun setNotes(notes: SnapshotStateList<NotesData>) {
+    LazyColumn(
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        items(items = notes, key = { listItem ->
+            listItem.id // or any other unique
+        }) {
+            NoteCard(note = it)
+        }
+    }
 
 }
 
