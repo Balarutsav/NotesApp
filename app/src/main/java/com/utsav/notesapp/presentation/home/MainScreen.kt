@@ -38,7 +38,6 @@ fun MainScreen(
                             homeViewModel.notes.size + 1
                         )
                     )
-                    Log.e("home view model list", "MainScreen: ${homeViewModel.notes.size}")
 
                 },
                 content = {
